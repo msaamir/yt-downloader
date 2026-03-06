@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import yt_dlp
 
-app = Flask(name)
+app = Flask(_name_)
 
 @app.route('/')
 def index():
