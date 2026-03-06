@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YT Downloader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        input { width: 80%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; }
+        button { padding: 12px 24px; background: #ff0000; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #res { margin-top: 20px; text-align: left; }
+        img { width: 100%; border-radius: 8px; margin-top: 10px; }
+        .download-btn { display: block; background: #007bff; color: white; padding: 10px; margin: 5px 0; text-decoration: none; text-align: center; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube Extractor</h1>
+        <input type="text" id="url" placeholder="Paste YouTube Link Here">
+        <br>
+        <button onclick="extract()">Get Video Details</button>
+        <div id="res"></div>
+    </div>
+
+    <script>
+        async function extract() {
+            const url = document.getElementById('url').value;
+            const resDiv = document.getElementById('res');
+            resDiv.innerHTML = "Processing... please wait.";
+            
+            try {
+                const response = await fetch('/extract', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url: url})
+                });
+                const data = await response.json();
+                
+                if(data.error) { resDiv.innerHTML = "Error: " + data.error; return; }
+
+                let html = <h3>${data.title}</h3><img src="${data.thumbnail}"><h4>Download Quality:</h4>;
+                data.formats.forEach(f => {
+                    html += <a href="${f.url}" target="_blank" class="download-btn">Download ${f.quality} (.${f.ext})</a>;
+                });
+                resDiv.innerHTML = html;
+            } catch (e) {
+                resDiv.innerHTML = "Something went wrong.";
+            }
+        }
+    </script>
+</body>
+</html>
